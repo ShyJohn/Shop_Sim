@@ -1,0 +1,59 @@
+[
+	{
+		"Name": "Milk",
+		"Price": 0.5,
+		"Aisle": 0,
+		"Shelf": 0
+	},
+
+	{
+		"Name": "Butter",
+		"Price": 0.5,
+		"Aisle": 0,
+		"Shelf": 1
+	},
+
+	{
+		"Name": "Yoghurt",
+		"Price": 0.9,
+		"Aisle": 0,
+		"Shelf": 2
+	},
+
+	{
+		"Name": "Cheese",
+		"Price": 3.0,
+		"Aisle": 0,
+		"Shelf": 3
+	},
+
+	{
+		"Name": "Cheesecake",
+		"Price": 4.0,
+		"Aisle": 0,
+		"Shelf": 4
+	},
+
+	{
+		"Name": "Custard",
+		"Price": 2.5,
+		"Aisle": 0,
+		"Shelf": 5
+	},
+
+	{
+		"Name": "Cream",
+		"Price": 0.8,
+		"Aisle": 0,
+		"Shelf": 6
+	},
+
+	{
+		"Name": "IcedCoffee",
+		"Price": 1.2,
+		"Aisle": 0,
+		"Shelf": 7
+	}
+
+
+]
