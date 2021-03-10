@@ -596,6 +596,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e684fc66ad461db41bae13682d2b98ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  greenCursorMaterial: {fileID: 2100000, guid: 9e89885241d713f4da5ca36f322233dc, type: 2}
+  redCursorMaterial: {fileID: 2100000, guid: 05140d6daea8a614dbb148a49e314e91, type: 2}
 --- !u!4 &929125447
 Transform:
   m_ObjectHideFlags: 0
@@ -1523,13 +1525,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2098761533}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.83, z: -7.26}
+  m_LocalRotation: {x: 0.38706017, y: -0, z: -0, w: 0.92205447}
+  m_LocalPosition: {x: 0, y: 6.6, z: -8.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 45.543003, y: 0, z: 0}
 --- !u!114 &2098761537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1537,7 +1539,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2098761533}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0f8e5e086a5bd4d41a477d2aaffb4472, type: 3}
   m_Name: 
@@ -1613,6 +1615,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LevelItemCursor
+      objectReference: {fileID: 0}
+    - target: {fileID: 3542760851827715114, guid: 32de7e761ec259742a384d8a8d6130e3,
+        type: 3}
+      propertyPath: m_TagString
+      value: LevelEditor_Cursor
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 32de7e761ec259742a384d8a8d6130e3, type: 3}

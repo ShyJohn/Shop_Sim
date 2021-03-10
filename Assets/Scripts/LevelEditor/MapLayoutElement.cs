@@ -6,6 +6,6 @@ using UnityEngine;
 public class MapLayoutElement
 {
     public string prefabPath;
-    public SerializableVector2 position = new SerializableVector2();
-    public List<SerializableVector2> gridSpaces = new List<SerializableVector2>();
+    public SerializableVector2Int position = new SerializableVector2Int();
+    public List<SerializableVector2Int> gridSpaces = new List<SerializableVector2Int>();
 }

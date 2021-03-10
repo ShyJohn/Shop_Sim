@@ -2,17 +2,17 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-internal enum CustomerState
+public enum CustomerState
 { AISLE_SEARCH, GO_TO_CHECKOUT, PUT_ITEMS_ON_CHECKOUT, WAIT_FOR_ITEMS_TO_BE_SCANNED, PAY, LEAVE_SHOP }
 
 public class CustomerAI : MonoBehaviour
 {
 	private NavMeshAgent agent;
 	private List<ShopItem> shoppingList;
-	private Stack<ShopItem> inventory;
-	private Stack<GameObject> checkoutInventory;
+	private Stack<ShopItem> inventory = new Stack<ShopItem>();
+	private Stack<GameObject> checkoutInventory = new Stack<GameObject>();
 
-	private CustomerState state;
+	public CustomerState state;
 
 	private int targetAisle;
 	private int targetShelfNumber;
@@ -26,7 +26,7 @@ public class CustomerAI : MonoBehaviour
 	private Checkout targetCheckout;
 	private Vector3 targetCheckoutQueuePosition = new Vector3();
 
-	private int currentQueuePosition;
+	public int currentQueuePosition;
 
 	private const int shoppingListSize = 3;
 
@@ -37,8 +37,6 @@ public class CustomerAI : MonoBehaviour
 	{
 		agent = GetComponent<NavMeshAgent>();
 		shoppingList = Utility.Instance.GenerateShoppingList(shoppingListSize);
-		inventory = new Stack<ShopItem>();
-		checkoutInventory = new Stack<GameObject>();
 		customerDestroyerPosition = GameObject.FindGameObjectWithTag("CustomerDestroyer").GetComponent<Transform>().position;
 	}
 
@@ -48,13 +46,13 @@ public class CustomerAI : MonoBehaviour
 		switch (state)
 		{
 			case CustomerState.AISLE_SEARCH:
-				if (shoppingList.Count == 0)
+				if (shoppingList.Count <= 0)
 				{
 					state = CustomerState.GO_TO_CHECKOUT;
 					targetCheckout = CheckoutManager.Instance.priorityCheckout;
-					targetCheckout.queueSize++;
-					targetCheckout.nextOpenQueueSlot = targetCheckout.queueSize - 1;
-					targetCheckoutQueuePosition = targetCheckout.queueSlots[targetCheckout.nextOpenQueueSlot].position;
+					targetCheckout.queue.Enqueue(gameObject);
+					currentQueuePosition = targetCheckout.queue.Count - 1;
+					targetCheckoutQueuePosition = targetCheckout.queueSlots[currentQueuePosition].position;
 					break;
 				}
 				if (!targetPositionFound)
@@ -91,9 +89,7 @@ public class CustomerAI : MonoBehaviour
 	}
 	private void PayCashier()
 	{
-		// Pay cashier
 		targetCheckout.GetComponentInChildren<CheckoutScanner>().ResetCheckout();
-
 		// Destory all shop items
 		// Temporary, in future put items in shopping trolley
 		int i;
@@ -103,6 +99,7 @@ public class CustomerAI : MonoBehaviour
 			Destroy(checkoutInventory.Peek().gameObject);
 			checkoutInventory.Pop();
 		}
+		targetCheckout.RemoveCustomerFromQueue();
 		state = CustomerState.LEAVE_SHOP;
 	}
 
@@ -116,8 +113,9 @@ public class CustomerAI : MonoBehaviour
 
 	private void WaitInQueue()
 	{
+		targetCheckoutQueuePosition = targetCheckout.queueSlots[currentQueuePosition].position;
 		agent.destination = targetCheckoutQueuePosition;
-		if (Vector3.Distance(transform.position, targetCheckout.queueSlots[0].position) < 1.0f)
+		if (targetCheckout.queue.Peek() == gameObject && Vector3.Distance(transform.position, targetCheckoutQueuePosition) < 1.0f)
 		{
 			state = CustomerState.PUT_ITEMS_ON_CHECKOUT;
 			Debug.Log(this.GetType().ToString() + ": WaitInQueue(): Customer put items on checkout");

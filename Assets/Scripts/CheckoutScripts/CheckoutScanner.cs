@@ -99,6 +99,10 @@ public class CheckoutScanner : MonoBehaviour {
 	public void ResetCheckout()
 	{
 		totalCostThisTransaction = 0.0f;
+		itemCount = 0;
+		numberOfItemsScanned = 0;
+		itemBeingScanned = null;
+		itemList.Clear();
 		for (int i = 0; i < 10; i++)
 		{
 			itemsAdded[i].text = "";

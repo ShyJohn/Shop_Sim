@@ -7,59 +7,121 @@ using System.IO;
 
 public class LevelEditorManager : MonoBehaviour
 {
-    GameObject item;
+    GameObject cursor;
+    [SerializeField] Material greenCursorMaterial;
+    [SerializeField] Material redCursorMaterial;
     float distanceFromGround = 0.5f;
     bool snapToGrid = true;
-    bool clicked = false;
+    bool leftClicked = false;
+    bool rightClicked = false;
     string itemPrefabString = "Prefabs/LevelItemPrefab";
-
     Save currentSave = new Save();
     bool rayCastCollision = false;
+
+    Dictionary<string, GameObject> mapLayoutDictionary = new Dictionary<string, GameObject>();
+
+    Vector2Int cursorGridPosition = new Vector2Int();
+
+    bool cursorAvailable = true;
+
     // Start is called before the first frame update
     void Start()
     {
-        item = GameObject.FindGameObjectWithTag("Item");
+        cursor = GameObject.FindGameObjectWithTag("LevelEditor_Cursor");
+        LoadLevel();
     }
 
     // Update is called once per frame
     void Update()
     {
         HoverItemAbovePlane();
-
+        UpdateCursorMaterial();
         DetectMouseClick();
     }
 
-    private void CreateItem(Vector3 position)
+    private void CreateItem(Vector2Int position)
     {
-        GameObject item = Instantiate(Resources.Load(itemPrefabString), position, Quaternion.identity) as GameObject;
-        MapLayoutElement newElement = new MapLayoutElement();
-        newElement.prefabPath = itemPrefabString;
-        newElement.position.x = position.x;
-        newElement.position.y = position.z;
-        SerializableVector2 gridSpace = new SerializableVector2();
-        gridSpace.x = position.x;
-        gridSpace.y = position.y;
-        newElement.gridSpaces.Add(gridSpace);
-        currentSave.mapLayout.Add(newElement);
+        if (!mapLayoutDictionary.ContainsKey(position.ToString()))
+        {
+            // Instantiate gameobject
+            Vector3 positionVector3 = new Vector3();
+            positionVector3.x = position.x;
+            positionVector3.y = 0.5f;
+            positionVector3.z = position.y;
+            GameObject item = Instantiate(Resources.Load(itemPrefabString), positionVector3, Quaternion.identity) as GameObject;
+
+            // Create maplayoutelement
+            MapLayoutElement newElement = new MapLayoutElement();
+            newElement.prefabPath = itemPrefabString;
+            newElement.position.x = position.x;
+            newElement.position.y = position.y;
+
+            // Create gridspace list for new maplayoutelement
+            SerializableVector2Int gridSpace = new SerializableVector2Int();
+            gridSpace.x = position.x;
+            gridSpace.y = position.y;
+            newElement.gridSpaces.Add(gridSpace);
+
+            // Add the new element to the current save & maplayoutdictionary
+            currentSave.mapLayout.Add(position.ToString(), newElement);
+            mapLayoutDictionary.Add(position.ToString(), item);
+        }
+    }
+
+    private void DeleteItem(Vector2Int position)
+    {
+        if(mapLayoutDictionary.ContainsKey(position.ToString()))
+        {
+            GameObject.Destroy(mapLayoutDictionary[position.ToString()]);
+            mapLayoutDictionary.Remove(position.ToString());
+            currentSave.mapLayout.Remove(position.ToString());
+        }
     }
 
     private void DetectMouseClick()
     {
-        if (Input.GetMouseButtonDown(0) && !clicked)
+        if (Input.GetMouseButtonDown(0) && !leftClicked)
 		{
-            clicked = true;
+            leftClicked = true;
             if(rayCastCollision)
             {
-                CreateItem(item.transform.position);
+                CreateItem(cursorGridPosition);
             }
 		}
 
-		if (Input.GetMouseButtonUp(0) && clicked)
+		if (Input.GetMouseButtonUp(0) && leftClicked)
 		{
-			clicked = false;
+			leftClicked = false;
+		}
+
+        if (Input.GetMouseButtonDown(1) && !rightClicked)
+		{
+            rightClicked = true;
+            if(rayCastCollision)
+            {
+                DeleteItem(cursorGridPosition);
+            }
+		}
+
+		if (Input.GetMouseButtonUp(1) && rightClicked)
+		{
+			rightClicked = false;
 		}
     }
 
+    private void UpdateCursorMaterial()
+    {
+        if(mapLayoutDictionary.ContainsKey(cursorGridPosition.ToString()) && cursorAvailable)
+        {
+            cursorAvailable = false;
+            cursor.GetComponent<MeshRenderer>().material = redCursorMaterial;
+        }
+        else if(!mapLayoutDictionary.ContainsKey(cursorGridPosition.ToString()) && !cursorAvailable)
+        {
+            cursorAvailable = true;
+            cursor.GetComponent<MeshRenderer>().material = greenCursorMaterial;
+        }
+    }
     public void SetItemCube()
     {
         itemPrefabString = "Prefabs/LevelItemPrefab";
@@ -88,15 +150,17 @@ public class LevelEditorManager : MonoBehaviour
             rayCastCollision = false;
         }
 
-        item.transform.position = pos;
+        cursor.transform.position = pos;
         
         if (snapToGrid)
         {
-            Vector3 tempPosition = item.transform.position;
+            Vector3 tempPosition = cursor.transform.position;
             tempPosition.x = Mathf.Round(tempPosition.x);
             tempPosition.y = 0.5f;
             tempPosition.z = Mathf.Round(tempPosition.z);
-            item.transform.position = tempPosition;
+            cursor.transform.position = tempPosition;
+            cursorGridPosition.x = (int)tempPosition.x;
+            cursorGridPosition.y = (int)tempPosition.z;
         }
 	}
 
@@ -123,14 +187,22 @@ public class LevelEditorManager : MonoBehaviour
             Save save = (Save)bf.Deserialize(file);
             file.Close();
 
-            foreach(MapLayoutElement element in save.mapLayout)
+            foreach(KeyValuePair<string, MapLayoutElement> element in save.mapLayout)
             {
+                // Instantiate gameobject
                 Vector3 position = new Vector3();
-                position.x = element.position.x;
+                position.x = element.Value.position.x;
                 position.y = 0.5f;
-                position.z = element.position.y;
-                GameObject item = Instantiate(Resources.Load(element.prefabPath), position, Quaternion.identity) as GameObject;
+                position.z = element.Value.position.y;
+                GameObject item = Instantiate(Resources.Load(element.Value.prefabPath), position, Quaternion.identity) as GameObject;
+
+                // Create grid position and add to map layout dictionary
+                Vector2Int gridPosition = new Vector2Int();
+                gridPosition.x = element.Value.position.x;
+                gridPosition.y = element.Value.position.y;
+                mapLayoutDictionary.Add(gridPosition.ToString(), item);
             }
+            currentSave = save;
         }   
     }
 }
