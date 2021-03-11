@@ -14,6 +14,7 @@ TagManager:
   - HoverOverDataText
   - HoverOverDataRoot
   - LevelEditor_Cursor
+  - UI_Balance
   layers:
   - Default
   - TransparentFX

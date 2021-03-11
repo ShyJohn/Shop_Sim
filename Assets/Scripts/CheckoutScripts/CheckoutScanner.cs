@@ -98,6 +98,7 @@ public class CheckoutScanner : MonoBehaviour {
 
 	public void ResetCheckout()
 	{
+		FinanceManager.Instance.AddToBalance(totalCostThisTransaction);
 		totalCostThisTransaction = 0.0f;
 		itemCount = 0;
 		numberOfItemsScanned = 0;

@@ -136,7 +136,7 @@ public class CustomerAI : MonoBehaviour
 		for (int i = 0; i < numberOfItemsInInventory; i++)
 		{
 			Vector3 itemSlotPosition = targetCheckout.itemSlots.GetChild(i).position;
-			GameObject item = Instantiate(Resources.Load("Prefabs/ItemPrefab"), itemSlotPosition, Quaternion.identity) as GameObject;
+			GameObject item = Instantiate(Resources.Load("Prefabs/Banana"), itemSlotPosition, Quaternion.identity) as GameObject;
 			item.GetComponent<ItemInfo>().nameOfItem = inventory.Peek().Name;
 			item.GetComponent<ItemInfo>().price = inventory.Peek().Price;
 			Debug.Log(this.GetType().ToString() + ": PutItemsOnCheckout(): Item name: " + item.GetComponent<ItemInfo>().nameOfItem + " Item price: £" + item.GetComponent<ItemInfo>().price);
